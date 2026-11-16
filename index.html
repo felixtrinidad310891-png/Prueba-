@@ -119,7 +119,7 @@
     <div class="action-row" style="margin-top:12px"><button class="btn danger small" id="deleteClipsBtn" type="button">Eliminar clips generados de este proyecto</button></div>
     <p class="fineprint">Límites de esta versión: máximo 200 MB por archivo para intentar el recorte; recomendado 100 MB o menos en Android. La resolución 9:16 puede recortar los bordes del video horizontal si eliges “Recorte central”. Revisa el encuadre y el audio de cada MP4 antes de publicarlo.</p>
   </section>
-  <footer class="footer">ClipViral AI · Sprint 4 · Revisión 7 · Diagnóstico avanzado FFmpeg</footer>
+  <footer class="footer">ClipViral AI · Sprint 4 · Revisión 8 · Diagnóstico avanzado FFmpeg</footer>
 </main>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="modal" id="previewModal" role="dialog" aria-modal="true" aria-labelledby="previewTitle">
@@ -132,7 +132,7 @@ const DB_VERSION=3;
 const MAX_WASM_FILE_BYTES=200*1024*1024;
 const FFMPEG_LIB_URL='https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js';
 const FFMPEG_WORKER_URL='https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/umd/814.ffmpeg.js';
-const FFMPEG_CORE_BASE='https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/umd';
+const FFMPEG_CORE_BASE='https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.10/dist/esm';
 const MAX_FILE_BYTES=500*1024*1024;
 const $=id=>document.getElementById(id);
 let db=null;
@@ -191,23 +191,23 @@ async function ensureFFmpeg(){
   const onUnhandled=event=>{globalErrors.push('Promesa: '+safeError(event&&event.reason))};
   try{
    if(!('Worker'in window)||!('WebAssembly'in window))throw new Error('Este navegador no admite Web Workers o WebAssembly. Actualiza Chrome.');
-   clipStatus('Revisión 7 · Etapa 1/4: descargando biblioteca FFmpeg…','info',true);
+   clipStatus('Revisión 8 · Etapa 1/4: descargando biblioteca FFmpeg…','info',true);
    stage='descarga de biblioteca FFmpeg';
    await loadExternalScript(FFMPEG_LIB_URL);
    const C=window.FFmpegWASM?.FFmpeg;
    if(!C)throw new Error('La biblioteca se descargó, pero no se encontró FFmpegWASM.FFmpeg.');
 
-   clipStatus('Revisión 7 · Etapa 2/4: descargando Worker…','info',true);
+   clipStatus('Revisión 8 · Etapa 2/4: descargando Worker…','info',true);
    stage='descarga del Worker de FFmpeg';
    const workerURL=await fetchAsBlobURL(FFMPEG_WORKER_URL,'text/javascript');
 
-   clipStatus('Revisión 7 · Etapa 3/4: descargando núcleo y WebAssembly…','info',true);
+   clipStatus('Revisión 8 · Etapa 3/4: descargando núcleo y WebAssembly…','info',true);
    stage='descarga del JavaScript del núcleo';
    const coreURL=await fetchAsBlobURL(FFMPEG_CORE_BASE+'/ffmpeg-core.js','text/javascript');
    stage='descarga del archivo WebAssembly';
    const wasmURL=await fetchAsBlobURL(FFMPEG_CORE_BASE+'/ffmpeg-core.wasm','application/wasm');
 
-   clipStatus('Revisión 7 · Etapa 4/4: iniciando Worker y núcleo WebAssembly…','info',true);
+   clipStatus('Revisión 8 · Etapa 4/4: iniciando Worker y núcleo WebAssembly…','info',true);
    stage='creación del motor FFmpeg';
    ffmpegInstance=new C();
    ffmpegInstance.on('log',({message})=>{
@@ -240,7 +240,7 @@ async function ensureFFmpeg(){
    const base=safeError(err);
    const workerInfo=workerMonitor&&workerMonitor.errors.length?' | Worker: '+workerMonitor.errors.join(' ; '):'';
    const globalInfo=globalErrors.length?' | Navegador: '+globalErrors.slice(-3).join(' ; '):'';
-   const diagnostic='Revisión 7 — etapa: '+stage+'. '+base+workerInfo+globalInfo+' | Chrome: '+(navigator.userAgent||'no informado').slice(0,160)+' | crossOriginIsolated: '+String(window.crossOriginIsolated===true);
+   const diagnostic='Revisión 8 — etapa: '+stage+'. '+base+workerInfo+globalInfo+' | Chrome: '+(navigator.userAgent||'no informado').slice(0,160)+' | crossOriginIsolated: '+String(window.crossOriginIsolated===true);
    try{ffmpegInstance?.terminate()}catch(e){}
    ffmpegInstance=null;ffmpegSourceProjectId=null;
    for(const u of ffmpegAssetUrls)URL.revokeObjectURL(u);
